@@ -5,6 +5,7 @@ from datetime import timedelta
 import datetime
 from lxml import etree
 import time
+import re
 
 
 start_time=time.time()
@@ -15,7 +16,6 @@ def constructBillID(billType,billNumber):
     billID=billType+'.'+str(billNumber)+'-115'
 
     return billID
-
 
 #get date
 today = datetime.datetime.today()
@@ -101,15 +101,32 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                 if date<s_date:
                     continue
 
+                regex = re.compile(r"&(?!amp;|lt;|gt;)")
+
                 f.write('<bill>')
+
+                billTiltle=regex.sub("&amp;", billTiltle)
                 f.write('<billTiltle>%s</billTiltle>'%billTiltle)
+
+                billCategory=regex.sub("&amp;", billCategory)
                 f.write('<billCategory>%s</billCategory>'%billCategory)
+
+                billType=regex.sub("&amp;", billType)
                 f.write('<billType>%s</billType>'%billType)
+
+                billNumber=regex.sub("&amp;", billNumber)
                 f.write('<billNumber>%s</billNumber>'%billNumber)
+
+                billID=regex.sub("&amp;", billID)
                 f.write('<billID>%s</billID>'%billID)
+
+                billIntroducedDate=regex.sub("&amp;", billIntroducedDate)
                 f.write('<billIntroducedDate>%s</billIntroducedDate>'%billIntroducedDate)
 
+
                 billStatus=billStatusET.findall('bill/latestAction/text')[0].text
+
+                billStatus=regex.sub("&amp;", billStatus)
                 f.write('<billStatus>%s</billStatus>'%billStatus)
 
                 #some bills dont have summaries
@@ -117,6 +134,8 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                     billSummary=billStatusET.findall('bill/summaries/billSummaries/item/text')[0].text
                 else:
                     billSummary=''
+
+                billSummary=regex.sub("&amp;", billSummary)
                 f.write('<billSummary><![CDATA[%s'%billSummary)
                 f.write(' ]]>')
                 f.write('</billSummary>')
