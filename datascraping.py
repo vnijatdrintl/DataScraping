@@ -5,6 +5,7 @@ from datetime import timedelta
 import datetime
 from lxml import etree
 import time
+import re
 
 
 start_time=time.time()
@@ -16,7 +17,6 @@ def constructBillID(billType,billNumber):
 
     return billID
 
-
 #get date
 today = datetime.datetime.today()
 s_date = today-timedelta(90)
@@ -25,7 +25,7 @@ s_date = s_date.strftime('%Y-%m-%d')
 
 #use api to retrieve all the information
 #make sure to modify the date parameter
-api_key = 'Cmb2yQaN2Pc3aM3TvewSxZ8qrN79M1gZ0b8taMgH'
+api_key = 'fr4Cwimezen65OxyRzJEwkXDCeVzhq1Z1u6iwLqN'
 
 i=0
 
@@ -62,29 +62,19 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                 summaryRequest = requests.get(summaryURL)
                 j+=1
 
-                while summaryRequest.status_code==503:
+                while summaryRequest.status_code!=200:
                     summaryRequest = requests.get(summaryURL)
 
                 print('summary response:',summaryRequest.status_code)
                 summaryJson = json.loads(summaryRequest.text)
 
-                #f.write('<bill>')
-
                 billTiltle = summaryJson['title']
-                #f.write('<billTiltle>%s</billTiltle>'%billTiltle)
 
                 #no category ID available
                 billCategory = summaryJson['category']
-                #f.write('<billCategory>%s</billCategory>'%billCategory)
-
                 billType = summaryJson['billType']
-                #f.write('<billType>%s</billType>'%billType)
-
                 billNumber = summaryJson['billNumber']
-                #f.write('<billNumber>%s</billNumber>'%billNumber)
-
                 billID = constructBillID(billType,billNumber)
-                #f.write('<billID>%s</billID>'%billID)
 
                 #get detail info:summary, introduced date,and status
                 billStatusLink=summaryJson['related']['billStatusLink']
@@ -97,19 +87,35 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
 
                 date=datetime.datetime.strptime(billIntroducedDate,"%Y-%m-%d")
                 s_date = today-timedelta(90)
-
                 if date<s_date:
                     continue
 
+                #regex = re.compile(r"&(?!amp;|lt;|gt;)")
+                regex = re.compile(r"&(?!amp;)")
+
                 f.write('<bill>')
+
+                billTiltle=regex.sub("&amp;", billTiltle)
                 f.write('<billTiltle>%s</billTiltle>'%billTiltle)
+
+                billCategory=regex.sub("&amp;", billCategory)
                 f.write('<billCategory>%s</billCategory>'%billCategory)
+
+                billType=regex.sub("&amp;", billType)
                 f.write('<billType>%s</billType>'%billType)
+
+                billNumber=regex.sub("&amp;", billNumber)
                 f.write('<billNumber>%s</billNumber>'%billNumber)
+
+                billID=regex.sub("&amp;", billID)
                 f.write('<billID>%s</billID>'%billID)
+
+                billIntroducedDate=regex.sub("&amp;", billIntroducedDate)
                 f.write('<billIntroducedDate>%s</billIntroducedDate>'%billIntroducedDate)
 
                 billStatus=billStatusET.findall('bill/latestAction/text')[0].text
+
+                billStatus=regex.sub("&amp;", billStatus)
                 f.write('<billStatus>%s</billStatus>'%billStatus)
 
                 #some bills dont have summaries
@@ -117,6 +123,8 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                     billSummary=billStatusET.findall('bill/summaries/billSummaries/item/text')[0].text
                 else:
                     billSummary=''
+
+                #billSummary=regex.sub("&amp;", billSummary)
                 f.write('<billSummary><![CDATA[%s'%billSummary)
                 f.write(' ]]>')
                 f.write('</billSummary>')
