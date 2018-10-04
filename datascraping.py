@@ -25,7 +25,7 @@ s_date = s_date.strftime('%Y-%m-%d')
 
 #use api to retrieve all the information
 #make sure to modify the date parameter
-api_key = 'Cmb2yQaN2Pc3aM3TvewSxZ8qrN79M1gZ0b8taMgH'
+api_key = 'fr4Cwimezen65OxyRzJEwkXDCeVzhq1Z1u6iwLqN'
 
 i=0
 
@@ -62,29 +62,19 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                 summaryRequest = requests.get(summaryURL)
                 j+=1
 
-                while summaryRequest.status_code==503:
+                while summaryRequest.status_code!=200:
                     summaryRequest = requests.get(summaryURL)
 
                 print('summary response:',summaryRequest.status_code)
                 summaryJson = json.loads(summaryRequest.text)
 
-                #f.write('<bill>')
-
                 billTiltle = summaryJson['title']
-                #f.write('<billTiltle>%s</billTiltle>'%billTiltle)
 
                 #no category ID available
                 billCategory = summaryJson['category']
-                #f.write('<billCategory>%s</billCategory>'%billCategory)
-
                 billType = summaryJson['billType']
-                #f.write('<billType>%s</billType>'%billType)
-
                 billNumber = summaryJson['billNumber']
-                #f.write('<billNumber>%s</billNumber>'%billNumber)
-
                 billID = constructBillID(billType,billNumber)
-                #f.write('<billID>%s</billID>'%billID)
 
                 #get detail info:summary, introduced date,and status
                 billStatusLink=summaryJson['related']['billStatusLink']
