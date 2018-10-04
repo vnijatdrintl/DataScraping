@@ -87,11 +87,11 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
 
                 date=datetime.datetime.strptime(billIntroducedDate,"%Y-%m-%d")
                 s_date = today-timedelta(90)
-
                 if date<s_date:
                     continue
 
-                regex = re.compile(r"&(?!amp;|lt;|gt;)")
+                #regex = re.compile(r"&(?!amp;|lt;|gt;)")
+                regex = re.compile(r"&(?!amp;)")
 
                 f.write('<bill>')
 
@@ -113,7 +113,6 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                 billIntroducedDate=regex.sub("&amp;", billIntroducedDate)
                 f.write('<billIntroducedDate>%s</billIntroducedDate>'%billIntroducedDate)
 
-
                 billStatus=billStatusET.findall('bill/latestAction/text')[0].text
 
                 billStatus=regex.sub("&amp;", billStatus)
@@ -125,7 +124,7 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                 else:
                     billSummary=''
 
-                billSummary=regex.sub("&amp;", billSummary)
+                #billSummary=regex.sub("&amp;", billSummary)
                 f.write('<billSummary><![CDATA[%s'%billSummary)
                 f.write(' ]]>')
                 f.write('</billSummary>')
