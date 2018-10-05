@@ -7,7 +7,7 @@ import downloadBills
 from tkinter import filedialog
 import os
 import tkinter as tk
-import re 
+import re
 
 
 start_time=time.time()
@@ -68,6 +68,8 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
             billTitle=billStatusET.findall('bill/title')[0].text
             print(billTitle)
 
+            billStatus=billStatusET.findall('bill/latestAction/text')[0].text
+
             if len(billStatusET.findall('bill/summaries/billSummaries/item/text'))>0:
                 billSummary=billStatusET.findall('bill/summaries/billSummaries/item/text')[0].text
             else:
@@ -89,8 +91,8 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
             f.write('<billCategory>%s</billCategory>'%billCategory)
 
             #billCategoryID n/a
-            billTiltle=regex.sub("&amp;", billTiltle)
-            f.write('<billTiltle>%s</billTiltle>'%billTiltle)
+            billTitle=regex.sub("&amp;", billTitle)
+            f.write('<billTiltle>%s</billTiltle>'%billTitle)
 
             billStatus=regex.sub("&amp;", billStatus)
             f.write('<billStatus>%s</billStatus>'%billStatus)
