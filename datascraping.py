@@ -27,21 +27,19 @@ s_date = s_date.strftime('%Y-%m-%d')
 #make sure to modify the date parameter
 api_key = 'fr4Cwimezen65OxyRzJEwkXDCeVzhq1Z1u6iwLqN'
 
-i=0
-
 url = 'https://api.govinfo.gov/collections/BILLS/%sT00:00:00Z/?offset=0&pageSize=100&api_key=%s'%(s_date,api_key)
 response = requests.get(url)
-i+=1
+
 print('initial response:',response.status_code)
 
 with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
     f.write('<bills>')
 
+    i=0
+
     #load collection to a json object
     bills = json.loads(response.text)
     nextPage = bills['nextPage']
-
-    j=0
 
     while nextPage != None:
 
@@ -60,7 +58,6 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                 summaryURL = '%s?api_key=%s'%(pageLink,api_key)
 
                 summaryRequest = requests.get(summaryURL)
-                j+=1
 
                 while summaryRequest.status_code!=200:
                     summaryRequest = requests.get(summaryURL)
@@ -94,6 +91,7 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
                 regex = re.compile(r"&(?!amp;)")
 
                 f.write('<bill>')
+                i+=1
 
                 billTiltle=regex.sub("&amp;", billTiltle)
                 f.write('<billTiltle>%s</billTiltle>'%billTiltle)
@@ -133,14 +131,13 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
 
             else:
                 continue
-        #just for testing
-        #break
+
         if nextPage==None:
             break
-        #time.sleep(100)
+
         url='%s&api_key=%s'%(nextPage,api_key)
         response = requests.get(url)
-        i+=1
+
         print('\n')
         print('nextpage response:',response.status_code)
         print('\n')
@@ -152,3 +149,4 @@ end_time=time.time()
 
 run_time=end_time-start_time
 print(run_time)
+print('Number of Bills: ',i)

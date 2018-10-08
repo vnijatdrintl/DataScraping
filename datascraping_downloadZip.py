@@ -2,27 +2,36 @@ import xml.etree.ElementTree as ET
 from datetime import timedelta
 import datetime
 from lxml import etree
-import time
 import downloadBills
 from tkinter import filedialog
 import os
+import time
 import tkinter as tk
 import re
+from getVotes import getVotes
 
 
 start_time=time.time()
 
+# def constructBillID(billType,billNumber):
+#
+#     billType='.'.join(billType.upper())
+#     billID=billType+'.'+str(billNumber)+'-115'
+#
+#     return billID
+
 def constructBillID(billType,billNumber):
 
-    billType='.'.join(billType.upper())
-    billID=billType+'.'+str(billNumber)+'-115'
+    billID=billType.lower()+str(billNumber)+'-115'
 
     return billID
-
 
 #get date
 today = datetime.datetime.today()
 s_date = today-timedelta(90)
+
+votes=getVotes(s_date)
+print(votes)
 
 root = tk.Tk()
 root.withdraw()
@@ -46,35 +55,29 @@ with open('U:\\datascraping\\test.xml','w',encoding='utf-8') as f:
             billIntroducedDate=billStatusET.findall('bill/actions/item/actionDate')[-1].text
             date=datetime.datetime.strptime(billIntroducedDate,"%Y-%m-%d")
 
-            if date<s_date:
-                continue
-
             billNumber=billStatusET.findall('bill/billNumber')[0].text
-            print(billNumber)
             billType=billStatusET.findall('bill/billType')[0].text
-            print(billType)
             billID=constructBillID(billType,billNumber)
             print(billID)
+
+            if date<s_date or billID in votes:
+                continue
 
             # "billCategory" pulled from "<policyArea><name>"
             if len(billStatusET.findall('bill/policyArea/name'))>0:
                 billCategory=billStatusET.findall('bill/policyArea/name')[0].text
             else:
                 billCategory=''
-            print(billCategory)
 
             #no billCategoryID found
 
             billTitle=billStatusET.findall('bill/title')[0].text
-            print(billTitle)
-
             billStatus=billStatusET.findall('bill/latestAction/text')[0].text
 
             if len(billStatusET.findall('bill/summaries/billSummaries/item/text'))>0:
                 billSummary=billStatusET.findall('bill/summaries/billSummaries/item/text')[0].text
             else:
                 billSummary=''
-            print(billSummary)
 
             f.write('<bill>')
 
