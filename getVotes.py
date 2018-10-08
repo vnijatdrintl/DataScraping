@@ -1,8 +1,5 @@
-import requests
-import json
+import requests, json, time, datetime
 from datetime import timedelta
-import time
-import datetime
 
 api_key='dxXYILBaKx6puqspbFgCbq30K2l5JflixJLoVgao'
 

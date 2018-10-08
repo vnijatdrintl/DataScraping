@@ -1,15 +1,11 @@
 import xml.etree.ElementTree as ET
 from datetime import timedelta
-import datetime
+import datetime, os, time, re
 from lxml import etree
 import downloadBills
 from tkinter import filedialog
-import os
-import time
 import tkinter as tk
-import re
 from getVotes import getVotes
-
 
 start_time=time.time()
 
