@@ -45,7 +45,7 @@ def getVotes(start_date):
         for vote in votes:
 
             try:
-                id=vote['bill']['bill_id']
+                id = vote['bill']['bill_id']
             except:
                 continue
             if id in ans:
